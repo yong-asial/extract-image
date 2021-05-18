@@ -1,10 +1,9 @@
-import os
 import cv2
 import os
 
 video_directory = 'video'
-image_directory = 'data'
-frameRate = 0.5 #//it will capture image in each 0.5 second
+image_directory = 'image'
+frameRate = 20 #//it will capture image in each x second
 
 try:
   # creating a folder named data
@@ -13,6 +12,10 @@ try:
 # if not created then raise error
 except OSError:
   print ('Error: Creating directory of data')
+
+def length_of_video(vidcap):
+  length = int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
+  return length
 
 def getFrame(vidcap, video_filename, sec, count):
   vidcap.set(cv2.CAP_PROP_POS_MSEC, sec*1000)
@@ -23,12 +26,17 @@ def getFrame(vidcap, video_filename, sec, count):
   return hasFrames
 
 for video_filename in os.listdir(video_directory):
+  if not (video_filename.endswith(".mov") or video_filename.endswith(".mp4")):
+    continue
   sec = 0
   count = 1
   vidcap = cv2.VideoCapture(os.path.join(video_directory, video_filename))
   success = getFrame(vidcap, video_filename, sec, count)
+  print(video_filename + '- start')
   while success:
+    print(count)
     count = count + 1
     sec = sec + frameRate
     sec = round(sec, 2)
     success = getFrame(vidcap, video_filename, sec, count)
+  print(video_filename + '- complete')
